@@ -1,0 +1,14 @@
+@import 'tailwindcss';
+/* 
+@theme {
+  --Box-shadow: 0px 0px 12px -7px #00000042;
+  --Medium-font: 1.33rem;
+  --radius-1: 0.51em;
+  --Border-radius-2: 0.25em;
+  --breakpoint-1xl: 90rem;
+  --color-primary: hsl(0, 0%, 98%);
+  --color-dark-theme-primary: #19171F;
+  --color-dark-theme-secondary:#222226;
+  }
+  @custom-variant dark (&:where(.dark, .dark *));
+ */
