@@ -1,22 +1,31 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-export default function Searchpanel({ countriesData }) {
-  const [inputValue, setinputValue] = useState('');
+export default function Searchpanel({ countriesData, setfocus, setcurrentCountriesData }) {
+  const [inputValue, setinputValue] = useState("");
   const [filterToggle, setfilterToggle] = useState(false);
-  const [currentContriesData, setcurrentContriesData] = useState(countriesData);
+  const continents = [
+    "Asia",
+    "Europe",
+    "North America",
+    "South America",
+    "Africa",
+    "Caribbean",
+    "Central America",
+    "Oceania",
+  ];
   // console.log(countriesData);
 
   function checkinputValueMatchesToAnyCountries(value) {
-    if (value && value !== ' ') {
+    if (value && value !== " ") {
       const result = countriesData.filter((country) => {
         return country.name.common.toLowerCase().includes(value.toLowerCase());
       });
-      setcurrentContriesData(result); //like i will be able to get all the matching countries.if wanted i can also specify to sliced but that is not good and needed.
+      setcurrentCountriesData(result);//--began from here, states are working fine, its time for the magic
       const resultSliced = result.slice(0, 10);
       // console.log(value,':value', value !== ' ');
       return resultSliced;
     }
-    return '';
+    return "";
   }
   // console.log(checkinputValueMatchesToAnyCountries());
   function filterCountriesForSearchBarSuggestion(resultSliced) {
@@ -24,7 +33,7 @@ export default function Searchpanel({ countriesData }) {
       return (
         <a
           key={++i}
-          className="cursor-pointer block px-[0.6em] py-[0.65em] bg-white hover:bg-red-50 dark:bg-dark-theme-secondary dark:hover:bg-red-500"
+          className="cursor-pointer block px-[0.6em] py-[0.65em] bg-secondary hover:bg-red-50 dark:bg-dark-theme-secondary dark:hover:bg-red-500"
           href={`/country-detailed.html?name=${country.name.common}`}
         >
           {country.name.common}
@@ -40,12 +49,15 @@ export default function Searchpanel({ countriesData }) {
   }
   return (
     <div className={`flex px-3 gap-x-2 justify-between items-start`}>
-      <div className={`max-w-96 ${filterToggle ? '' : 'w-full'}`}>
+      <div
+        className={`max-w-96 relative z-100 ${filterToggle ? "" : "w-full"}`}
+      >
+        {console.log(Boolean(inputValue.length))}
         <form
           className={`${
-            filterToggle ? '' : 'flex'
-          } bg-white dark:bg-dark-theme-secondary rounded-1 ${
-            Boolean(inputValue.length) ? 'rounded-b-none border-b-[0.2em]' : ''
+            filterToggle ? "" : "flex"
+          } bg-secondary dark:bg-dark-theme-secondary rounded-1 ${
+            Boolean(inputValue.length) ? "rounded-b-none" : ""
           }`}
         >
           <button
@@ -54,17 +66,28 @@ export default function Searchpanel({ countriesData }) {
             disabled={filterToggle ? true : false}
             title={`${
               filterToggle
-                ? 'Close Filter To Use Search'
-                : 'Search For A Country'
+                ? "Close Filter To Use Search"
+                : "Search Any Country"
             }`}
           >
-            {filterToggle ? (
+            {!filterToggle ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 42 42"
+                className={`size-5 md:size-6.5 cursor-pointer fill-black  dark:fill-white ${
+                  inputValue ? "" : "opacity-50"
+                } hover:opacity-100`}
+                //one of the limitation that is still there is, on input focus it does not get to opacity-100 fix it later.
+              >
+                <path d="M1 17.838c0 8.747 7.131 15.827 15.94 15.827c8.796 0 15.938-7.08 15.938-15.827S25.736 2 16.94 2C8.131 2 1 9.091 1 17.838zm5.051 0c0-5.979 4.868-10.817 10.89-10.817c6.01 0 10.888 4.839 10.888 10.817c0 5.979-4.878 10.818-10.888 10.818c-6.022 0-10.89-4.84-10.89-10.818zm22.111 14.523l6.855 7.809c1.104 1.102 1.816 1.111 2.938 0l2.201-2.181c1.082-1.081 1.149-1.778 0-2.921l-7.896-6.775l-4.098 4.068z" />
+              </svg>
+            ) : (
               <svg
                 viewBox="0 0 128 128"
                 xmlns="http://www.w3.org/2000/svg"
                 aria-hidden="true"
                 // aria-label='hello'
-                className="size-5 md:size-6.5 cursor-pointer"
+                className="size-5 md:size-6.5 cursor-not-allowed"
                 fill="#000000"
               >
                 <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
@@ -82,22 +105,9 @@ export default function Searchpanel({ countriesData }) {
                   ></path>
                 </g>
               </svg>
-            ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 42 42"
-                className={`size-5 md:size-6.5 cursor-pointer fill-black  dark:fill-white ${
-                  inputValue ? '' : 'opacity-50'
-                } hover:opacity-100`}
-                //one of the limitation that is still there is, on input focus it does not get to opacity-100 fix it later. 
-              >
-                <path d="M1 17.838c0 8.747 7.131 15.827 15.94 15.827c8.796 0 15.938-7.08 15.938-15.827S25.736 2 16.94 2C8.131 2 1 9.091 1 17.838zm5.051 0c0-5.979 4.868-10.817 10.89-10.817c6.01 0 10.888 4.839 10.888 10.817c0 5.979-4.878 10.818-10.888 10.818c-6.022 0-10.89-4.84-10.89-10.818zm22.111 14.523l6.855 7.809c1.104 1.102 1.816 1.111 2.938 0l2.201-2.181c1.082-1.081 1.149-1.778 0-2.921l-7.896-6.775l-4.098 4.068z" />
-              </svg>
             )}
           </button>
-          {filterToggle ? (
-            ''
-          ) : (
+          {filterToggle ? null : (
             <input
               className="outline-0 w-full pr-3.5"
               onInput={(e) => {
@@ -109,11 +119,13 @@ export default function Searchpanel({ countriesData }) {
                 setinputValue(
                   checkinputValueMatchesToAnyCountries(e.target.value)
                 );
+                setfocus(true);
                 // console.log(Boolean(e.target.value), e.target.value);
               }}
               onBlur={() => {
-                setinputValue(''); //empty array can also be used, but i think it is heavy then empty string.
-                // e.target.value = '';//i don't think it is usefull but i am leaving it as it can be done as well.
+                setinputValue(""); //empty array can also be used, but i think it is heavy then empty string.
+                // e.target.value = null;//i don't think it is usefull but i am leaving it as it can be done as well.
+                setfocus(false);
               }}
               // id="search-bar-input" add if you think it is usefull else discard.
               type="text"
@@ -121,30 +133,35 @@ export default function Searchpanel({ countriesData }) {
             />
           )}
         </form>
-        {Boolean(inputValue.length) ? (
-          <div className="search-bar-suggestion__list font-medium [&>a+a]:border-t-[#fafafa] dark:[&>a+a]:border-t-dark-theme-secondary [&>a+a]:border-t-[0.15em] [&>a:last-child]:rounded-b-1">
-            {filterCountriesForSearchBarSuggestion(inputValue)}
-          </div>
-        ) : (
-          ''
+        {
+          Boolean(inputValue.length) ? (
+            <div
+              id="bro"
+              className="font-medium absolute w-full search-bar__suggestion-list"
+            >
+              {filterCountriesForSearchBarSuggestion(inputValue)}
+            </div>
+          ) : null
           // console.log('bro the user input is not focused! or they have not made any inputs.')
-        )}
+        }
       </div>
-      <div className={`${filterToggle ? 'w-full max-w-96 md:max-w-56' : ''} `}>
+      <div
+        className={`${
+          filterToggle ? "w-full max-w-96 md:max-w-56 relative z-100" : ""
+        } `}
+      >
         <div
-          className={`rounded-1 bg-white dark:bg-dark-theme-secondary ${
+          className={`rounded-1 bg-secondary dark:bg-dark-theme-secondary ${
             filterToggle
-              ? 'flex items-center pl-2 justify-between rounded-b-none border-b-[0.2em] '
-              : ''
+              ? "flex items-center pl-2 justify-between rounded-b-none "
+              : ""
           }`}
         >
           {filterToggle ? (
             <p className={`$`}>
               <b>Filter By Region</b>
             </p>
-          ) : (
-            ''
-          )}
+          ) : null}
 
           <div
             className="cursor-pointer p-2 md:p-2.5"
@@ -165,21 +182,12 @@ export default function Searchpanel({ countriesData }) {
           </div>
         </div>
         {filterToggle ? (
-          <div className="search-bar-suggestion__list font-medium [&>span+span]:border-t-[#fafafa] dark:[&>span+span]:border-t-dark-theme-secondary [&>span+span]:border-t-[0.15em] [&>span:last-child]:rounded-b-1">
-            {[
-              'Asia',
-              'Europe',
-              'North America',
-              'South America',
-              'Africa',
-              'Caribbean',
-              'Central America',
-              'Oceania',
-            ].map((region, i) => {
+          <div className="search-bar__filter-continents-list absolute w-full font-medium">
+            {continents.map((region, i) => {
               return (
                 <span
                   key={++i}
-                  className="cursor-pointer block px-[0.6em] py-[0.65em] bg-white hover:bg-red-50  dark:bg-dark-theme-secondary dark:hover:bg-red-500"
+                  className="cursor-pointer block px-[0.6em] py-[0.65em] bg-secondary hover:bg-red-50 dark:bg-dark-theme-secondary dark:hover:bg-red-500"
                   onClick={() => {
                     filterCountriesByRegion(region);
                   }}
@@ -189,9 +197,7 @@ export default function Searchpanel({ countriesData }) {
               );
             })}
           </div>
-        ) : (
-          ''
-        )}
+        ) : null}
       </div>
     </div>
   );

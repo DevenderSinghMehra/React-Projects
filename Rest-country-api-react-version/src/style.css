@@ -1,14 +1,45 @@
-@import 'tailwindcss';
-/* 
+@import "tailwindcss";
+
 @theme {
   --Box-shadow: 0px 0px 12px -7px #00000042;
   --Medium-font: 1.33rem;
   --radius-1: 0.51em;
   --Border-radius-2: 0.25em;
   --breakpoint-1xl: 90rem;
-  --color-primary: hsl(0, 0%, 98%);
-  --color-dark-theme-primary: #19171F;
-  --color-dark-theme-secondary:#222226;
+  --color-primary: #f5f6f8;
+  --color-secondary: #ffffff;
+  --color-brown: #7c5a00;
+  --color-dark-theme-primary: #111219;
+  --color-dark-theme-secondary: #222226;
+}
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer components {
+  .search-bar__suggestion-list > a:first-child {
+    @apply border-t-[0.2em];
+    @apply border-t-black;
+    @apply dark:border-t-white;
   }
-  @custom-variant dark (&:where(.dark, .dark *));
- */
+  .search-bar__suggestion-list > a + a {
+    @apply border-t-[#fafafa];
+    @apply dark:border-t-[#2a2b31];
+    @apply border-t-[0.15em];
+  }
+  .search-bar__suggestion-list > a:last-child {
+    @apply rounded-b-1;
+  }
+  .search-bar__filter-continents-list > span:first-child {
+    @apply border-t-[0.2em];
+    @apply border-t-black;
+    @apply dark:border-t-white;
+    @apply bg-green-600
+  }
+  .search-bar__filter-continents-list span + span {
+    @apply border-t-[0.15em];
+    @apply border-t-[#fafafa];
+    @apply dark:border-t-[#2a2b31];
+  }
+  .search-bar__filter-continents-list > span:last-child {
+    @apply rounded-b-1;
+  }
+}

@@ -1,7 +1,7 @@
 // import { useState } from 'react';
 export default function Navbar({ isDarkThemeOn, themeChangingFunction }) {
   return (
-      <div className="bg-white dark:bg-dark-theme-secondary radius-1 mb-3 md:mb-6">
+      <div className="bg-secondary dark:bg-dark-theme-secondary radius-1 mb-3 md:mb-6">
         <nav className="1xl:m-auto max-w-[1440px] flex justify-center items-center px-5 md:px-12 py-4 dark:text-white ">
           <h1 className=" text-[1.2rem] md:text-2xl font-bold mr-5">
             <a href="index.html">Where in the world ?</a>
