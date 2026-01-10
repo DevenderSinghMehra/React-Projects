@@ -1,6 +1,10 @@
 import { useState } from "react";
 
-export default function Searchpanel({ countriesData, setfocus, setcurrentCountriesData }) {
+export default function Searchpanel({
+  countriesData,
+  setcurrentCountriesData,
+  setfocus,
+}) {
   const [inputValue, setinputValue] = useState("");
   const [filterToggle, setfilterToggle] = useState(false);
   const continents = [
@@ -15,28 +19,102 @@ export default function Searchpanel({ countriesData, setfocus, setcurrentCountri
   ];
   // console.log(countriesData);
 
-  function checkinputValueMatchesToAnyCountries(value) {
-    if (value && value !== " ") {
-      const result = countriesData.filter((country) => {
-        return country.name.common.toLowerCase().includes(value.toLowerCase());
-      });
-      setcurrentCountriesData(result);//--began from here, states are working fine, its time for the magic
-      const resultSliced = result.slice(0, 10);
-      // console.log(value,':value', value !== ' ');
-      return resultSliced;
+  function checkinputValueMatchesToAnyCountries(eventObj) {
+    let string = eventObj.value.toLowerCase().trim();
+    if (isCorrectValue()) {
+      eventObj.setCustomValidity(""); //the reason i am always setting it is, anyway it is trivial and will not cause performance decline.
+      const noDuplicatesmatchedCountryNames = valueMatch(8);
+      // console.log(noDuplicatesmatchedCountryNames);
+      return noDuplicatesmatchedCountryNames;
+    } else {
+      if (string.length) {
+        eventObj.reportValidity(); //for empty string i don't want it to fire.
+      }
+      return "";
     }
-    return "";
+
+    // indiap pakistan din //this case si not working fix this, it is showing me multiple spaces error.
+    function isCorrectValue() {
+      if (!string) {
+        // console.log('it is an empty string')
+        return false; //no need to run it if it is an empty string.
+      }
+      let isprevCharSpace = null;
+      /* if it is a number,symbol expect '-' and recurring space it will not be considered */
+      for (const char of string) {
+        // console.log("ran");
+        if (char === " ") {
+          if (!isprevCharSpace) {
+            isprevCharSpace = true;
+            // console.log("space onces");
+            continue;
+          }
+          eventObj.setCustomValidity(
+            "Please use only single spaces between words."
+          );
+          // console.log("recurring space");
+          return false; //this will fail when there is mulitple spaces
+        }
+        isprevCharSpace = false;
+        // console.log(code);
+        if (char === "-") {
+          // console.log("it is a hyphen");
+          continue;
+        }
+        const code = char.charCodeAt(0);
+        const isLowerCase = code >= 97 && code <= 122;
+        if (!isLowerCase) {
+          eventObj.setCustomValidity(
+            "Only letters, spaces, and hyphens are allowed."
+          );
+          // console.log("it is not lower case alphabet and it is not a hyphen as well.");
+          return false; //if it is a number this will take care.
+        }
+      }
+      return true;
+    }
+    function valueMatch(sliceTill) {
+      string = string.split(" "); //splitting it for multiple value search.
+      // console.log(string.length);
+      let matchedCountryNames = [];
+      function matchCountry(str) {
+        countriesData.forEach((country) => {
+          const countryName = country.name.common.toLowerCase();
+          const check = countryName.includes(str);
+          if (check) {
+            // arrCountryNameOnly.push(countryName);
+            matchedCountryNames.push(countryName);
+          }
+        });
+      }
+      for (const value of string) {
+        // console.log(value)
+        matchCountry(value);
+      }
+      const uniqueMatchedCountryNames = [...new Set(matchedCountryNames)];
+      return uniqueMatchedCountryNames.slice(0, sliceTill);
+    }
+    /* 
+    //mulitple country search enable, code should run on each array value, every single value should be used to filter.
+    const resultSliced = result.slice(0, 10);
+    // console.log(value,':value', value !== ' ');
+    return resultSliced;
+    // return''
+
+    setfocus(false);
+    return ""; */
   }
   // console.log(checkinputValueMatchesToAnyCountries());
-  function filterCountriesForSearchBarSuggestion(resultSliced) {
-    return resultSliced.map((country, i) => {
+  function filterCountriesForSearchBarSuggestion(countryNames) {
+    //it is written in jsx and is being called from there, the argu, used to call is an state so when state updates it will call.
+    return countryNames.map((Name, i) => {
       return (
         <a
           key={++i}
           className="cursor-pointer block px-[0.6em] py-[0.65em] bg-secondary hover:bg-red-50 dark:bg-dark-theme-secondary dark:hover:bg-red-500"
-          href={`/country-detailed.html?name=${country.name.common}`}
+          href={`/country-detailed.html?name=${Name}`}
         >
-          {country.name.common}
+          {Name}
         </a>
       );
     });
@@ -52,8 +130,14 @@ export default function Searchpanel({ countriesData, setfocus, setcurrentCountri
       <div
         className={`max-w-96 relative z-100 ${filterToggle ? "" : "w-full"}`}
       >
-        {console.log(Boolean(inputValue.length))}
+        {/* {console.log(inputValue)} */}
         <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            setcurrentCountriesData(inputValue);
+            setinputValue(""); //this is to turn the suggestionlist down
+            setfocus(false);
+          }}
           className={`${
             filterToggle ? "" : "flex"
           } bg-secondary dark:bg-dark-theme-secondary rounded-1 ${
@@ -65,9 +149,7 @@ export default function Searchpanel({ countriesData, setfocus, setcurrentCountri
             type="submit"
             disabled={filterToggle ? true : false}
             title={`${
-              filterToggle
-                ? "Close Filter To Use Search"
-                : "Search Any Country"
+              filterToggle ? "Close Filter To Use Search" : "Search Any Country"
             }`}
           >
             {!filterToggle ? (
@@ -109,21 +191,25 @@ export default function Searchpanel({ countriesData, setfocus, setcurrentCountri
           </button>
           {filterToggle ? null : (
             <input
+              maxLength={44}
+              required
               className="outline-0 w-full pr-3.5"
-              onInput={(e) => {
-                setinputValue(
-                  checkinputValueMatchesToAnyCountries(e.target.value)
-                );
-              }}
-              onFocus={(e) => {
-                setinputValue(
-                  checkinputValueMatchesToAnyCountries(e.target.value)
-                );
-                setfocus(true);
+              onInput={
+                (e) => {
+                  // console.log(e.target.value,e.target.value.length)
+                  setinputValue(checkinputValueMatchesToAnyCountries(e.target));
+                }
                 // console.log(Boolean(e.target.value), e.target.value);
-              }}
+              }
+              onFocus={
+                (e) => {
+                  setfocus(true);
+                  setinputValue(checkinputValueMatchesToAnyCountries(e.target));
+                } //only run this when it is not an empty string
+              }
               onBlur={() => {
-                setinputValue(""); //empty array can also be used, but i think it is heavy then empty string.
+                setinputValue(""); 
+                //empty array can also be used, but i think it is heavy then empty string.
                 // e.target.value = null;//i don't think it is usefull but i am leaving it as it can be done as well.
                 setfocus(false);
               }}

@@ -1,9 +1,14 @@
 import Countrycardimage from "url:../../resources/card-design.png";
 import Icons from "url:../../public/icons.svg";
-console.log(Icons);
 
 export default function Card({ currentCountriesData, isDarkThemeOn }) {
-  const slicedCountriesData = currentCountriesData.slice(0,10);
+  if (!currentCountriesData) {
+    return <div>no Countries available!</div>;
+  }
+  const slicedCountriesData =
+    currentCountriesData.length > 10
+      ? currentCountriesData.slice(0, 10)
+      : currentCountriesData;
   const numberFormatter = new Intl.NumberFormat("en-IN", {
     notation: "compact",
     compactDisplay: "short",
@@ -15,11 +20,16 @@ export default function Card({ currentCountriesData, isDarkThemeOn }) {
     if (keys.length === 1) {
       return <b>{`${keys[0]} `}</b>;
     } else if (keys.length > 1) {
-      const extraKeys = keys.slice(1)
+      const extraKeys = keys.slice(1);
       return (
         <b>
           {`${keys[0]} `}
-          <span title={extraKeys.join(', ')} className="text-red-600 dark:text-blue-500 cursor-wait">{extraKeys.length}+</span>
+          <span
+            title={extraKeys.join(", ")}
+            className="text-red-600 dark:text-blue-500 cursor-wait"
+          >
+            {extraKeys.length}+
+          </span>
         </b>
       );
     }
@@ -77,7 +87,7 @@ export default function Card({ currentCountriesData, isDarkThemeOn }) {
                 </span>
               </div>
             </div>
-           
+
             <button className="text-center text-white text-[0.8em] font-bold py-1.5 rounded-[0.8em] bg-[#00B164] bg-linear from-[#00B164] from-50% to-[#3d894a] w-full hover:scale-102">
               View Country
             </button>
